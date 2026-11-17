@@ -1,3 +1,11 @@
+# Optimized by ci-cost (https://github.com/mariotavarez/ci-cost)
+# Applied 4 optimizations:
+# - [HIGH] Add cargo dependency cache to "min_version" job
+# - [HIGH] Add cargo dependency cache to "bat-tests" job
+# - [HIGH] Add cargo dependency cache to "build-and-test" job
+# - [MEDIUM] Add concurrency group to "CI.yml"
+# Estimated savings: ~26 min/run
+#
 name: CI
 
 on:
@@ -8,6 +16,10 @@ on:
   pull_request:
     branches: [ master ]
 
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 env:
   CARGO_TERM_COLOR: always
 
