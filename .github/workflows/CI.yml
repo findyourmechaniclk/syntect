@@ -22,6 +22,16 @@ jobs:
         toolchain: stable minus 2 releases # MSRV policy = last three versions of stable
         components: clippy, rustfmt
 
+    - name: Cache cargo dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-
+
     - name: Run cargo fmt --check
       run: cargo fmt -- --check
 
@@ -47,6 +57,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v6
+
+    - name: Cache cargo dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-
+
     - run: RUSTDOCFLAGS='--deny warnings' cargo doc --no-deps --document-private-items --all-features
 
   bat-tests:
@@ -62,10 +83,21 @@ jobs:
         path: 'bat'
         ref: master
         submodules: true
+
+    - name: Cache cargo dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-
+
     - name: bat/tests/syntax-tests/regression_test.sh
       run: |
         cd bat
-        sed -i 's%\[dependencies.syntect\]%[dependencies.syntect]\npath = "../syntect"%' Cargo.toml
+        sed -i 's%\\[dependencies.syntect\\]%[dependencies.syntect]\\npath = \\"../syntect\\"%' Cargo.toml
         cargo build --release # Build bat so we can update the assets
         PATH=$PWD/target/release:$PATH ./assets/create.sh # Update assets with newly built bat
         cargo build --release # Build bat using the newly updated assets
@@ -83,6 +115,17 @@ jobs:
       with:
         submodules: true
     - uses: dtolnay/rust-toolchain@stable
+
+    - name: Cache cargo dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-
+
     - name: Build
       run: |
         cargo build
@@ -117,6 +160,17 @@ jobs:
     steps:
     - uses: actions/checkout@v6
     - uses: dtolnay/rust-toolchain@stable
+
+    - name: Cache cargo dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-
+
     - uses: taiki-e/install-action@v2
       with:
         tool: cargo-hack
